@@ -11,55 +11,55 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { margin: 0; padding: 0; font-family: sans-serif; user-select: none; background: #010810; color: #fff; overflow: hidden; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
 
-    /* Top Connect Bar */
-    .top-bar {
-      background: #071628; border-bottom: 2px solid #1a3a5a; padding: 10px 15px; display: flex; justify-content: flex-end; align-items: center; z-index: 100;
+    /* Top Sonar Full Screen View */
+    .sonar-section {
+      flex: 1; position: relative; display: flex; flex-direction: column; background: #010810; overflow: hidden; border-bottom: 2px solid #1a3a5a;
+    }
+    .top-sonar-header {
+      background: #040d1a; padding: 8px 12px; display: flex; justify-content: flex-end; align-items: center; z-index: 100;
     }
     .bt-connect-btn {
-      background: #1d3557; border: 2px solid #00ffcc; color: #fff; padding: 8px 16px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      background: #1d3557; border: 2px solid #00ffcc; color: #fff; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.5);
     }
-
-    /* Middle Sonar Full Screen View */
-    .sonar-section {
-      flex: 1; position: relative; display: flex; flex-direction: column; background: #010810; overflow: hidden;
-    }
-    .sonar-info-hud {
-      position: absolute; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; z-index: 10; pointer-events: none;
-    }
-    .hud-box {
-      background: rgba(5, 20, 34, 0.9); border: 1.5px solid #1f3a60; padding: 8px 12px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.7);
-    }
-    .hud-title { font-size: 9px; color: #888; font-weight: bold; }
-    .hud-value { font-size: 14px; font-weight: bold; color: #ffcc00; font-family: monospace; margin-top: 2px; }
-    
     #sonarCanvas { flex: 1; width: 100%; height: 100%; display: block; }
 
-    /* Bottom Center Big Compass & Speed Section */
+    /* Bottom Center Compass & Depth/Bottom Section */
     .bottom-compass-section {
-      background: #071628; border-top: 2px solid #ffcc00; padding: 12px 20px; display: flex; align-items: center; justify-content: center; gap: 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.9); z-index: 100; position: relative; transition: all 0.3s ease;
+      background: #071628; border-top: 2px solid #ffcc00; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -4px 20px rgba(0,0,0,0.9); z-index: 100; position: relative; transition: all 0.3s ease;
     }
     
     /* Full Screen Compass Mode */
     .bottom-compass-section.fullscreen-compass {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #020b14; flex-direction: column; justify-content: center; gap: 30px; z-index: 99999;
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #020b14; flex-direction: column; justify-content: center; align-items: center; gap: 30px; z-index: 99999; padding: 20px;
     }
     .bottom-compass-section.fullscreen-compass .compass-large-dial {
-      width: 220px !important; height: 220px !important; border-width: 5px !important;
+      width: 250px !important; height: 250px !important; border-width: 6px !important;
     }
-    .bottom-compass-section.fullscreen-compass .compass-large-needle {
-      height: 160px !important; width: 12px !important;
-    }
-    .bottom-compass-section.fullscreen-compass .arrow-head { border-left-width: 14px; border-right-width: 14px; border-bottom-width: 65px; }
-    .bottom-compass-section.fullscreen-compass .arrow-tail { width: 6px; height: 95px; }
-    .bottom-compass-section.fullscreen-compass .heading-deg { font-size: 55px !important; }
-    .bottom-compass-section.fullscreen-compass .close-fs-hint { display: block !important; }
+    .bottom-compass-section.fullscreen-compass .c-label { font-size: 20px !important; }
+    .bottom-compass-section.fullscreen-compass .lbl-n { top: 8px !important; }
+    .bottom-compass-section.fullscreen-compass .lbl-s { bottom: 8px !important; }
+    .bottom-compass-section.fullscreen-compass .lbl-e { right: 12px !important; }
+    .bottom-compass-section.fullscreen-compass .lbl-w { left: 12px !important; }
 
-    .close-fs-hint { display: none; position: absolute; top: 20px; right: 20px; background: #e63946; color: #fff; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 12px; cursor: pointer; }
+    .bottom-compass-section.fullscreen-compass .compass-large-needle {
+      height: 180px !important; width: 14px !important;
+    }
+    .bottom-compass-section.fullscreen-compass .arrow-head { border-left-width: 16px; border-right-width: 16px; border-bottom-width: 75px; }
+    .bottom-compass-section.fullscreen-compass .arrow-tail { width: 6px; height: 105px; }
+    .bottom-compass-section.fullscreen-compass .heading-deg { font-size: 60px !important; text-align: center; }
+    .bottom-compass-section.fullscreen-compass .speed-label { font-size: 20px !important; text-align: center; }
+    .bottom-compass-section.fullscreen-compass .close-fs-hint { display: block !important; }
+    .bottom-compass-section.fullscreen-compass .side-hud-box { display: none !important; }
+    .bottom-compass-section.fullscreen-compass .center-compass-group { flex-direction: column; align-items: center; gap: 15px; }
+
+    .close-fs-hint { display: none; position: absolute; top: 20px; right: 20px; background: #e63946; color: #fff; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 14px; cursor: pointer; }
+
+    .center-compass-group { display: flex; align-items: center; gap: 12px; cursor: pointer; }
 
     .compass-large-dial {
-      width: 75px; height: 75px; border-radius: 50%; border: 3px solid #ffcc00;
+      width: 68px; height: 68px; border-radius: 50%; border: 3px solid #ffcc00;
       background: #000; position: relative; display: flex; align-items: center; justify-content: center;
-      box-shadow: inset 0 0 10px rgba(0,255,204,0.5); cursor: pointer; transition: all 0.3s ease;
+      box-shadow: inset 0 0 10px rgba(0,255,204,0.5);
     }
     .c-label { position: absolute; font-size: 9px; font-weight: bold; color: #fff; }
     .lbl-n { top: 2px; color: #ff0000; }
@@ -68,18 +68,25 @@
     .lbl-w { left: 4px; }
     
     .compass-large-needle {
-      width: 5px; height: 50px; position: absolute; display: flex; flex-direction: column; align-items: center; transition: transform 0.1s linear;
+      width: 5px; height: 44px; position: absolute; display: flex; flex-direction: column; align-items: center; transition: transform 0.1s linear;
     }
-    .arrow-head { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 20px solid #00ffcc; }
-    .arrow-tail { width: 2px; height: 30px; background: #ffffff; }
+    .arrow-head { width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-bottom: 18px solid #00ffcc; }
+    .arrow-tail { width: 2px; height: 26px; background: #ffffff; }
 
     .compass-info-box { display: flex; flex-direction: column; justify-content: center; }
-    .heading-deg { font-size: 26px; font-weight: bold; color: #00ffcc; font-family: monospace; line-height: 1; }
-    .speed-label { font-size: 12px; color: #ffcc00; font-family: monospace; margin-top: 4px; font-weight: bold; }
+    .heading-deg { font-size: 22px; font-weight: bold; color: #00ffcc; font-family: monospace; line-height: 1; }
+    .speed-label { font-size: 11px; color: #ffcc00; font-family: monospace; margin-top: 3px; font-weight: bold; }
+
+    /* Left & Right Side HUD Boxes near Compass */
+    .side-hud-box {
+      background: rgba(5, 20, 34, 0.95); border: 1.5px solid #1f3a60; padding: 6px 10px; border-radius: 8px; min-width: 105px; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.7);
+    }
+    .hud-title { font-size: 8px; color: #888; font-weight: bold; }
+    .hud-value { font-size: 12px; font-weight: bold; color: #ffcc00; font-family: monospace; margin-top: 2px; }
 
     /* Bottom Control Bar */
     .bottom-control-bar {
-      height: 52px; background: #040d1a; border-top: 1px solid #1a3a5a; display: flex; align-items: center; justify-content: space-around; padding: 5px; z-index: 100;
+      height: 50px; background: #040d1a; border-top: 1px solid #1a3a5a; display: flex; align-items: center; justify-content: space-around; padding: 4px; z-index: 100;
     }
     .ctrl-btn {
       flex: 1; margin: 0 3px; height: 38px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;
@@ -108,48 +115,49 @@
 </head>
 <body>
 
-  <!-- Top Connect Bar -->
-  <div class="top-bar">
-    <button class="bt-connect-btn" id="btSonarBtn" onclick="connectBluetoothSonar()">
-      📡 சோனார் இணை
-    </button>
-  </div>
-
-  <!-- Middle Sonar View -->
+  <!-- Top Sonar Section -->
   <div class="sonar-section">
-    <div class="sonar-info-hud">
-      <!-- Left Side: Depth -->
-      <div class="hud-box">
-        <div class="hud-title">ஆழம் (DEPTH)</div>
-        <div class="hud-value" id="liveDepthVal">12.4 பாவம் (22.6 M)</div>
-      </div>
-      <!-- Right Side: Seabed Type -->
-      <div class="hud-box" style="text-align: right;">
-        <div class="hud-title">தரை நிலை</div>
-        <div class="hud-value" id="liveBottomVal" style="color: #00ffcc;">🪨 பாறை (Reef)</div>
-      </div>
+    <div class="top-sonar-header">
+      <button class="bt-connect-btn" id="btSonarBtn" onclick="connectBluetoothSonar()">
+        📡 சோனார் இணை
+      </button>
     </div>
     <canvas id="sonarCanvas"></canvas>
   </div>
 
-  <!-- Bottom Center Compass & Speed Section -->
-  <div class="bottom-compass-section" id="compassSection" onclick="toggleFullscreenCompass()">
+  <!-- Bottom Compass & Depth/Bottom Section -->
+  <div class="bottom-compass-section" id="compassSection">
     <div class="close-fs-hint" onclick="event.stopPropagation(); toggleFullscreenCompass();">✖ மூடு</div>
     
-    <div class="compass-large-dial">
-      <span class="c-label lbl-n">N</span>
-      <span class="c-label lbl-s">S</span>
-      <span class="c-label lbl-e">E</span>
-      <span class="c-label lbl-w">W</span>
-      <div class="compass-large-needle" id="bigNeedle">
-        <div class="arrow-head"></div>
-        <div class="arrow-tail"></div>
+    <!-- Left Side: Depth -->
+    <div class="side-hud-box">
+      <div class="hud-title">ஆழம் (DEPTH)</div>
+      <div class="hud-value" id="liveDepthVal">12.4 பாவம்</div>
+    </div>
+
+    <!-- Center Compass & Speed Group -->
+    <div class="center-compass-group" onclick="toggleFullscreenCompass()">
+      <div class="compass-large-dial">
+        <span class="c-label lbl-n">N</span>
+        <span class="c-label lbl-s">S</span>
+        <span class="c-label lbl-e">E</span>
+        <span class="c-label lbl-w">W</span>
+        <div class="compass-large-needle" id="bigNeedle">
+          <div class="arrow-head"></div>
+          <div class="arrow-tail"></div>
+        </div>
+      </div>
+
+      <div class="compass-info-box">
+        <div class="heading-deg" id="largeHeadingVal">0° N</div>
+        <div class="speed-label" id="boatSpeedVal">வேகம்: 0.0 kts</div>
       </div>
     </div>
 
-    <div class="compass-info-box">
-      <div class="heading-deg" id="largeHeadingVal">0° N</div>
-      <div class="speed-label" id="boatSpeedVal">வேகம்: 0.0 kts</div>
+    <!-- Right Side: Seabed Type -->
+    <div class="side-hud-box" style="text-align: center;">
+      <div class="hud-title">தரை நிலை</div>
+      <div class="hud-value" id="liveBottomVal" style="color: #00ffcc;">🪨 பாறை (Reef)</div>
     </div>
   </div>
 
@@ -254,7 +262,7 @@
     function saveCurrentSpot() {
       let name = document.getElementById('spotNameInput').value.trim();
       let saved = JSON.parse(localStorage.getItem('marineReefs') || '[]');
-      saved.push({ id: Date.now(), name: name, lat: currentLat, lng: lng = currentLng, nautical_north: formatCoord(currentLat, true) });
+      saved.push({ id: Date.now(), name: name, lat: currentLat, lng: currentLng, nautical_north: formatCoord(currentLat, true) });
       localStorage.setItem('marineReefs', JSON.stringify(saved));
       document.getElementById('spotModal').style.display = 'none';
       alert("📍 " + name + " சேமிக்கப்பட்டது!");
