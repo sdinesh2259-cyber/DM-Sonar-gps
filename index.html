@@ -11,15 +11,32 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { margin: 0; padding: 0; font-family: sans-serif; user-select: none; background: #010810; color: #fff; overflow: hidden; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
 
+    /* Top Bar with Live GPS Dot & Coords */
+    .top-bar {
+      background: #040d1a; border-bottom: 2px solid #1a3a5a; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; z-index: 100;
+    }
+    .gps-live-display {
+      display: flex; align-items: center; gap: 8px; background: rgba(5, 20, 34, 0.95); border: 1.5px solid #1f3a60; padding: 6px 10px; border-radius: 8px;
+    }
+    .live-dot {
+      width: 10px; height: 10px; background: #00ffcc; border-radius: 50%; box-shadow: 0 0 8px #00ffcc; animation: pulseDot 1.5s infinite;
+    }
+    @keyframes pulseDot {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #00ffcc; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .gps-coords-text {
+      font-size: 11px; font-weight: bold; color: #00ffcc; font-family: monospace; line-height: 1.2;
+    }
+
+    .bt-connect-btn {
+      background: #1d3557; border: 2px solid #00ffcc; color: #fff; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
     /* Top Sonar Full Screen View */
     .sonar-section {
       flex: 1; position: relative; display: flex; flex-direction: column; background: #010810; overflow: hidden; border-bottom: 2px solid #1a3a5a;
-    }
-    .top-sonar-header {
-      background: #040d1a; padding: 8px 12px; display: flex; justify-content: flex-end; align-items: center; z-index: 100;
-    }
-    .bt-connect-btn {
-      background: #1d3557; border: 2px solid #00ffcc; color: #fff; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.5);
     }
     #sonarCanvas { flex: 1; width: 100%; height: 100%; display: block; }
 
@@ -77,7 +94,6 @@
     .heading-deg { font-size: 22px; font-weight: bold; color: #00ffcc; font-family: monospace; line-height: 1; }
     .speed-label { font-size: 11px; color: #ffcc00; font-family: monospace; margin-top: 3px; font-weight: bold; }
 
-    /* Left & Right Side HUD Boxes near Compass */
     .side-hud-box {
       background: rgba(5, 20, 34, 0.95); border: 1.5px solid #1f3a60; padding: 6px 10px; border-radius: 8px; min-width: 105px; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.7);
     }
@@ -115,13 +131,19 @@
 </head>
 <body>
 
+  <!-- Top Bar with Live GPS Dot & Coords -->
+  <div class="top-bar">
+    <div class="gps-live-display">
+      <div class="live-dot"></div>
+      <div class="gps-coords-text" id="topGpsCoords">8° 49.406' N<br>78° 8.971' E</div>
+    </div>
+    <button class="bt-connect-btn" id="btSonarBtn" onclick="connectBluetoothSonar()">
+      📡 சோனார் இணை
+    </button>
+  </div>
+
   <!-- Top Sonar Section -->
   <div class="sonar-section">
-    <div class="top-sonar-header">
-      <button class="bt-connect-btn" id="btSonarBtn" onclick="connectBluetoothSonar()">
-        📡 சோனார் இணை
-      </button>
-    </div>
     <canvas id="sonarCanvas"></canvas>
   </div>
 
@@ -298,6 +320,11 @@
           currentHeading = Math.round(pos.coords.heading);
         }
 
+        // Update Live GPS Coords at Top Left
+        let latStr = formatCoord(currentLat, true);
+        let lngStr = formatCoord(currentLng, false);
+        document.getElementById('topGpsCoords').innerHTML = `${latStr}<br>${lngStr}`;
+
         document.getElementById('boatSpeedVal').innerText = `வேகம்: ${speed.toFixed(1)} kts`;
         document.getElementById('largeHeadingVal').innerText = `${currentHeading}° ${getHeadingDir(currentHeading)}`;
         
@@ -318,7 +345,7 @@
 
     function drawSonar() {
       canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight - 40;
+      canvas.height = canvas.parentElement.clientHeight;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       if (!isScanning) return;
