@@ -11,15 +11,15 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { margin: 0; padding: 0; font-family: sans-serif; user-select: none; background: #010810; color: #fff; overflow: hidden; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
 
-    /* Top Bar with Live GPS Dot & Coords */
+    /* Top Bar with Live GPS Dot, Coords & Quick Save Button */
     .top-bar {
-      background: #040d1a; border-bottom: 2px solid #1a3a5a; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; z-index: 100;
+      background: #040d1a; border-bottom: 2px solid #1a3a5a; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; z-index: 100;
     }
     .gps-live-display {
-      display: flex; align-items: center; gap: 8px; background: rgba(5, 20, 34, 0.95); border: 1.5px solid #1f3a60; padding: 6px 10px; border-radius: 8px;
+      display: flex; align-items: center; gap: 6px; background: rgba(5, 20, 34, 0.95); border: 1.5px solid #1f3a60; padding: 4px 8px; border-radius: 8px; cursor: pointer;
     }
     .live-dot {
-      width: 10px; height: 10px; background: #00ffcc; border-radius: 50%; box-shadow: 0 0 8px #00ffcc; animation: pulseDot 1.5s infinite;
+      width: 9px; height: 9px; background: #00ffcc; border-radius: 50%; box-shadow: 0 0 8px #00ffcc; animation: pulseDot 1.5s infinite;
     }
     @keyframes pulseDot {
       0% { transform: scale(0.95); opacity: 0.8; }
@@ -27,7 +27,10 @@
       100% { transform: scale(0.95); opacity: 0.8; }
     }
     .gps-coords-text {
-      font-size: 11px; font-weight: bold; color: #00ffcc; font-family: monospace; line-height: 1.2;
+      font-size: 10.5px; font-weight: bold; color: #00ffcc; font-family: monospace; line-height: 1.2;
+    }
+    .quick-save-tag {
+      background: #e63946; color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 4px; font-weight: bold; margin-left: 4px;
     }
 
     .bt-connect-btn {
@@ -131,11 +134,12 @@
 </head>
 <body>
 
-  <!-- Top Bar with Live GPS Dot & Coords -->
+  <!-- Top Bar with Live GPS Dot, Coords & Quick Save -->
   <div class="top-bar">
-    <div class="gps-live-display">
+    <div class="gps-live-display" onclick="openSpotModal()" title="தொட்டு இந்த இடத்தை சேமிக்க">
       <div class="live-dot"></div>
       <div class="gps-coords-text" id="topGpsCoords">8° 49.406' N<br>78° 8.971' E</div>
+      <div class="quick-save-tag">💾 சேமி</div>
     </div>
     <button class="bt-connect-btn" id="btSonarBtn" onclick="connectBluetoothSonar()">
       📡 சோனார் இணை
@@ -284,10 +288,10 @@
     function saveCurrentSpot() {
       let name = document.getElementById('spotNameInput').value.trim();
       let saved = JSON.parse(localStorage.getItem('marineReefs') || '[]');
-      saved.push({ id: Date.now(), name: name, lat: currentLat, lng: currentLng, nautical_north: formatCoord(currentLat, true) });
+      saved.push({ id: Date.now(), name: name, lat: currentLat, lng: currentLng, nautical_north: formatCoord(currentLat, true), nautical_east: formatCoord(currentLng, false) });
       localStorage.setItem('marineReefs', JSON.stringify(saved));
       document.getElementById('spotModal').style.display = 'none';
-      alert("📍 " + name + " சேமிக்கப்பட்டது!");
+      alert("📍 " + name + " வெற்றிகரமாக சேமிக்கப்பட்டது!");
     }
 
     function openCoordModal() {
@@ -320,7 +324,6 @@
           currentHeading = Math.round(pos.coords.heading);
         }
 
-        // Update Live GPS Coords at Top Left
         let latStr = formatCoord(currentLat, true);
         let lngStr = formatCoord(currentLng, false);
         document.getElementById('topGpsCoords').innerHTML = `${latStr}<br>${lngStr}`;
