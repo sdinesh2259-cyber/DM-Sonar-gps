@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Odukan Sonar & Big Compass Pro</title>
+  <title>DM Sonar GPS</title>
   
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230b132b'/%3E%3Cpath d='M20 62 L80 62 L70 78 L30 78 Z' fill='%2300ffcc' stroke='%23ffffff' stroke-width='2'/%3E%3Cpath d='M50 20 L50 62 M50 24 L74 54 L50 54 Z' fill='%23ffcc00' stroke='%23ffffff' stroke-width='2'/%3E%3C/svg%3E">
   
@@ -16,21 +16,24 @@
       background: #040d1a; border-bottom: 2px solid #1a3a5a; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; z-index: 100;
     }
     .gps-live-display {
-      display: flex; align-items: center; gap: 6px; background: rgba(5, 20, 34, 0.95); border: 1.5px solid #1f3a60; padding: 4px 8px; border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; gap: 8px; background: rgba(5, 20, 34, 0.95); border: 1.5px solid #1f3a60; padding: 5px 10px; border-radius: 8px; cursor: pointer;
     }
     .live-dot {
-      width: 9px; height: 9px; background: #00ffcc; border-radius: 50%; box-shadow: 0 0 8px #00ffcc; animation: pulseDot 1.5s infinite;
+      width: 9px; height: 9px; background: #00ffcc; border-radius: 50%; box-shadow: 0 0 8px #00ffcc; animation: pulseDot 1.5s infinite; flex-shrink: 0;
     }
     @keyframes pulseDot {
       0% { transform: scale(0.95); opacity: 0.8; }
       50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #00ffcc; }
       100% { transform: scale(0.95); opacity: 0.8; }
     }
-    .gps-coords-text {
-      font-size: 10.5px; font-weight: bold; color: #00ffcc; font-family: monospace; line-height: 1.2;
+    .gps-coords-container {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .gps-coord-line {
+      font-size: 11px; font-weight: bold; color: #00ffcc; font-family: monospace; white-space: nowrap;
     }
     .quick-save-tag {
-      background: #e63946; color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 4px; font-weight: bold; margin-left: 4px;
+      background: #e63946; color: #fff; font-size: 9px; padding: 3px 6px; border-radius: 4px; font-weight: bold; margin-left: 4px; flex-shrink: 0;
     }
 
     .bt-connect-btn {
@@ -139,7 +142,10 @@
   <div class="top-bar">
     <div class="gps-live-display" onclick="openSpotModal()" title="தொட்டு இந்த இடத்தை சேமிக்க">
       <div class="live-dot"></div>
-      <div class="gps-coords-text" id="topGpsCoords">8° 49.406' N<br>78° 8.971' E</div>
+      <div class="gps-coords-container">
+        <div class="gps-coord-line" id="latCoordLine">Lat: 8° 49.406' N</div>
+        <div class="gps-coord-line" id="lngCoordLine">Lng: 78° 8.971' E</div>
+      </div>
       <div class="quick-save-tag">💾 சேமி</div>
     </div>
     <button class="bt-connect-btn" id="btSonarBtn" onclick="connectBluetoothSonar()">
@@ -218,7 +224,7 @@
   <!-- Saved Spots List Modal -->
   <div class="modal-overlay" id="spotsListModal">
     <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-title">📂 சோனார் ஜிபிஎஸ் மெமரி ஃபைல்</div>
+      <div class="modal-title">📁 DM Sonar GPS மெமரி ஃபைல்</div>
       <div style="font-size: 11px; color: #00ffcc; margin-bottom: 8px; text-align: center;">போன் மெமரியில் பதிந்த பார்கள் பட்டியல்:</div>
       <div id="spotsContainer" style="max-height: 200px; overflow-y: auto; margin-bottom: 10px;">
         <!-- Dynamic Items will load here -->
@@ -282,11 +288,10 @@
 
     function saveCurrentSpot() {
       let name = document.getElementById('spotNameInput').value.trim();
-      let saved = JSON.parse(localStorage.getItem('OdukanSonarGPS_Memory') || '[]');
+      let saved = JSON.parse(localStorage.getItem('DMSonarGPS_Memory') || '[]');
       saved.push({ id: Date.now(), name: name, lat: currentLat, lng: currentLng, latStr: formatCoord(currentLat, true), lngStr: formatCoord(currentLng, false) });
-      localStorage.setItem('OdukanSonarGPS_Memory', JSON.stringify(saved));
+      localStorage.setItem('DMSonarGPS_Memory', JSON.stringify(saved));
       
-      // Automatically trigger phone memory download file
       exportPhoneMemoryFileSilent(saved);
 
       document.getElementById('spotModal').style.display = 'none';
@@ -296,7 +301,7 @@
     function openSpotsListModal() {
       const container = document.getElementById('spotsContainer');
       container.innerHTML = '';
-      let saved = JSON.parse(localStorage.getItem('OdukanSonarGPS_Memory') || '[]');
+      let saved = JSON.parse(localStorage.getItem('DMSonarGPS_Memory') || '[]');
       
       if(saved.length === 0) {
         container.innerHTML = '<div style="text-align:center; color:#888; font-size:12px; padding:20px;">மெமரி ஃபைலில் பார்கள் எதுவும் இல்லை!</div>';
@@ -318,18 +323,18 @@
     }
 
     function deleteSpot(id) {
-      let saved = JSON.parse(localStorage.getItem('OdukanSonarGPS_Memory') || '[]');
+      let saved = JSON.parse(localStorage.getItem('DMSonarGPS_Memory') || '[]');
       saved = saved.filter(item => item.id !== id);
-      localStorage.setItem('OdukanSonarGPS_Memory', JSON.stringify(saved));
+      localStorage.setItem('DMSonarGPS_Memory', JSON.stringify(saved));
       openSpotsListModal();
     }
 
     function exportPhoneMemoryFile() {
-      const dataStr = localStorage.getItem('OdukanSonarGPS_Memory') || '[]';
+      const dataStr = localStorage.getItem('DMSonarGPS_Memory') || '[]';
       const blob = new Blob([dataStr], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `Odukan_Sonar_GPS_Memory_${new Date().toLocaleDateString().replace(/\//g, '-')}.json`;
+      a.download = `DM_Sonar_GPS_Memory_${new Date().toLocaleDateString().replace(/\//g, '-')}.json`;
       a.click();
       alert("📥 போன் டவுன்லோட்ஸ் (Downloads) ஃபோல்டருக்குள் ஃபைல் சேமிக்கப்பட்டுவிட்டது!");
     }
@@ -338,7 +343,7 @@
       const blob = new Blob([JSON.stringify(savedData)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `Odukan_Sonar_GPS_Memory.json`;
+      a.download = `DM_Sonar_GPS_Memory.json`;
       a.click();
     }
 
@@ -353,7 +358,8 @@
 
         let latStr = formatCoord(currentLat, true);
         let lngStr = formatCoord(currentLng, false);
-        document.getElementById('topGpsCoords').innerHTML = `${latStr}<br>${lngStr}`;
+        document.getElementById('latCoordLine').innerText = `Lat: ${latStr}`;
+        document.getElementById('lngCoordLine').innerText = `Lng: ${lngStr}`;
 
         document.getElementById('boatSpeedVal').innerText = `வேகம்: ${speed.toFixed(1)} kts`;
         document.getElementById('largeHeadingVal').innerText = `${currentHeading}° ${getHeadingDir(currentHeading)}`;
@@ -394,7 +400,6 @@
       ctx.stroke();
 
       // Fish
-      fileListMock = [];
       fishList.forEach(f => {
         f.x -= f.s;
         if (f.x < -40) f.x = canvas.width + 40;
