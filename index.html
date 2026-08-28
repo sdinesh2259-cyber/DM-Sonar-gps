@@ -11,7 +11,7 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { margin: 0; padding: 0; font-family: sans-serif; user-select: none; background: #010810; color: #fff; overflow: hidden; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
 
-    /* Top Bar with Live GPS Dot, Coords & Quick Save Button */
+    /* Top Bar */
     .top-bar {
       background: #040d1a; border-bottom: 2px solid #1a3a5a; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; z-index: 100;
     }
@@ -43,27 +43,21 @@
     }
     #sonarCanvas { flex: 1; width: 100%; height: 100%; display: block; }
 
-    /* Bottom Center Compass & Depth/Bottom Section */
+    /* Bottom Compass Section */
     .bottom-compass-section {
       background: #071628; border-top: 2px solid #ffcc00; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 -4px 20px rgba(0,0,0,0.9); z-index: 100; position: relative; transition: all 0.3s ease;
     }
     
-    /* Full Screen Compass Mode */
     .bottom-compass-section.fullscreen-compass {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #020b14; flex-direction: column; justify-content: center; align-items: center; gap: 30px; z-index: 99999; padding: 20px;
     }
-    .bottom-compass-section.fullscreen-compass .compass-large-dial {
-      width: 250px !important; height: 250px !important; border-width: 6px !important;
-    }
+    .bottom-compass-section.fullscreen-compass .compass-large-dial { width: 250px !important; height: 250px !important; border-width: 6px !important; }
     .bottom-compass-section.fullscreen-compass .c-label { font-size: 20px !important; }
     .bottom-compass-section.fullscreen-compass .lbl-n { top: 8px !important; }
     .bottom-compass-section.fullscreen-compass .lbl-s { bottom: 8px !important; }
     .bottom-compass-section.fullscreen-compass .lbl-e { right: 12px !important; }
     .bottom-compass-section.fullscreen-compass .lbl-w { left: 12px !important; }
-
-    .bottom-compass-section.fullscreen-compass .compass-large-needle {
-      height: 180px !important; width: 14px !important;
-    }
+    .bottom-compass-section.fullscreen-compass .compass-large-needle { height: 180px !important; width: 14px !important; }
     .bottom-compass-section.fullscreen-compass .arrow-head { border-left-width: 16px; border-right-width: 16px; border-bottom-width: 75px; }
     .bottom-compass-section.fullscreen-compass .arrow-tail { width: 6px; height: 105px; }
     .bottom-compass-section.fullscreen-compass .heading-deg { font-size: 60px !important; text-align: center; }
@@ -108,19 +102,19 @@
       height: 50px; background: #040d1a; border-top: 1px solid #1a3a5a; display: flex; align-items: center; justify-content: space-around; padding: 4px; z-index: 100;
     }
     .ctrl-btn {
-      flex: 1; margin: 0 3px; height: 38px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;
+      flex: 1; margin: 0 2px; height: 38px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 10.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 3px;
     }
     .btn-spot { background: #e63946; }
-    .btn-search { background: #2a9d8f; }
+    .btn-list { background: #2a9d8f; }
     .btn-sonar-on { background: #0077b6; border: 1px solid #00ffcc; }
     .btn-export { background: #1d3557; }
 
     /* Modals */
     .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 20000; display: none; align-items: center; justify-content: center;
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 20000; display: none; align-items: center; justify-content: center;
     }
     .modal-content {
-      background: #111; color: #fff; padding: 16px; border-radius: 12px; width: 90%; max-width: 320px; border: 1px solid #444;
+      background: #111; color: #fff; padding: 16px; border-radius: 12px; width: 92%; max-width: 350px; border: 1px solid #444; max-height: 80vh; overflow-y: auto;
     }
     .modal-title { font-size: 14px; font-weight: bold; color: #ffcc00; margin-bottom: 10px; text-align: center; }
     .input-group { margin-bottom: 10px; }
@@ -130,11 +124,19 @@
     .modal-btn { flex: 1; padding: 8px; border: none; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 11px; }
     .btn-save { background: #2a9d8f; color: #fff; }
     .btn-cancel { background: #e63946; color: #fff; }
+
+    /* Saved Spots List Item Style */
+    .spot-item {
+      background: #071628; border: 1px solid #1f3a60; padding: 8px 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .spot-info div:first-child { font-size: 12px; font-weight: bold; color: #00ffcc; }
+    .spot-info div:last-child { font-size: 10px; color: #ffcc00; font-family: monospace; margin-top: 2px; }
+    .del-spot-btn { background: #d90429; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; }
   </style>
 </head>
 <body>
 
-  <!-- Top Bar with Live GPS Dot, Coords & Quick Save -->
+  <!-- Top Bar -->
   <div class="top-bar">
     <div class="gps-live-display" onclick="openSpotModal()" title="தொட்டு இந்த இடத்தை சேமிக்க">
       <div class="live-dot"></div>
@@ -151,7 +153,7 @@
     <canvas id="sonarCanvas"></canvas>
   </div>
 
-  <!-- Bottom Compass & Depth/Bottom Section -->
+  <!-- Bottom Compass Section -->
   <div class="bottom-compass-section" id="compassSection">
     <div class="close-fs-hint" onclick="event.stopPropagation(); toggleFullscreenCompass();">✖ மூடு</div>
     
@@ -190,7 +192,7 @@
   <!-- Bottom Control Bar -->
   <div class="bottom-control-bar">
     <button class="ctrl-btn btn-spot" onclick="openSpotModal()">📍 பார் சேமி</button>
-    <button class="ctrl-btn btn-search" onclick="openCoordModal()">🔍 எண் தேடு</button>
+    <button class="ctrl-btn btn-list" onclick="openSpotsListModal()">📁 பட்டியல்</button>
     <button class="ctrl-btn btn-sonar-on" onclick="toggleSonarScan()">⚡ ஸ்கேன்</button>
     <button class="ctrl-btn btn-export" onclick="exportSavedData()">💾 எடு</button>
   </div>
@@ -214,22 +216,14 @@
     </div>
   </div>
 
-  <!-- Coord Search Modal -->
-  <div class="modal-overlay" id="coordModal">
+  <!-- Saved Spots List Modal -->
+  <div class="modal-overlay" id="spotsListModal">
     <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-title">🔍 ஜிபிஎஸ் எண் தேடல்</div>
-      <div class="input-group">
-        <label>Latitude மினிட்:</label>
-        <input type="number" id="searchLatMin" class="input-box" placeholder="49.406" step="any">
+      <div class="modal-title">📁 சேமிக்கப்பட்ட பார்கள் பட்டியல்</div>
+      <div id="spotsContainer" style="max-height: 220px; overflow-y: auto; margin-bottom: 10px;">
+        <!-- Dynamic Items will load here -->
       </div>
-      <div class="input-group">
-        <label>Longitude மினிட்:</label>
-        <input type="number" id="searchLngMin" class="input-box" placeholder="8.972" step="any">
-      </div>
-      <div class="modal-btn-row">
-        <button class="modal-btn btn-save" onclick="executeCoordSearch()">🚀 தேடு</button>
-        <button class="modal-btn btn-cancel" onclick="document.getElementById('coordModal').style.display='none'">ரத்து</button>
-      </div>
+      <button class="modal-btn btn-cancel" onclick="document.getElementById('spotsListModal').style.display='none'" style="width:100%;">மூடு</button>
     </div>
   </div>
 
@@ -288,23 +282,41 @@
     function saveCurrentSpot() {
       let name = document.getElementById('spotNameInput').value.trim();
       let saved = JSON.parse(localStorage.getItem('marineReefs') || '[]');
-      saved.push({ id: Date.now(), name: name, lat: currentLat, lng: currentLng, nautical_north: formatCoord(currentLat, true), nautical_east: formatCoord(currentLng, false) });
+      saved.push({ id: Date.now(), name: name, lat: currentLat, lng: currentLng, latStr: formatCoord(currentLat, true), lngStr: formatCoord(currentLng, false) });
       localStorage.setItem('marineReefs', JSON.stringify(saved));
       document.getElementById('spotModal').style.display = 'none';
       alert("📍 " + name + " வெற்றிகரமாக சேமிக்கப்பட்டது!");
     }
 
-    function openCoordModal() {
-      document.getElementById('coordModal').style.display = 'flex';
+    function openSpotsListModal() {
+      const container = document.getElementById('spotsContainer');
+      container.innerHTML = '';
+      let saved = JSON.parse(localStorage.getItem('marineReefs') || '[]');
+      
+      if(saved.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:#888; font-size:12px; padding:20px;">சேமிக்கப்பட்ட பார்கள் எதுவும் இல்லை!</div>';
+      } else {
+        saved.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'spot-item';
+          div.innerHTML = `
+            <div class="spot-info">
+              <div>📍 ${item.name}</div>
+              <div>${item.latStr} | ${item.lngStr}</div>
+            </div>
+            <button class="del-spot-btn" onclick="deleteSpot(${item.id})">நீக்கு</button>
+          `;
+          container.appendChild(div);
+        });
+      }
+      document.getElementById('spotsListModal').style.display = 'flex';
     }
 
-    function executeCoordSearch() {
-      let mLat = parseFloat(document.getElementById('searchLatMin').value);
-      let mLng = parseFloat(document.getElementById('searchLngMin').value);
-      if(!isNaN(mLat) && !isNaN(mLng)) {
-        alert("🎯 இலக்கு கண்டறியப்பட்டது!");
-        document.getElementById('coordModal').style.display = 'none';
-      } else { alert("சரியான எண்களை உள்ளிடவும்!"); }
+    function deleteSpot(id) {
+      let saved = JSON.parse(localStorage.getItem('marineReefs') || '[]');
+      saved = saved.filter(item => item.id !== id);
+      localStorage.setItem('marineReefs', JSON.stringify(saved));
+      openSpotsListModal(); // Refresh list
     }
 
     function exportSavedData() {
