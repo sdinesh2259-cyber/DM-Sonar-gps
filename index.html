@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Odukan Sonar & Big Compass Pro</title>
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230b132b'/%3E%3Cpath d='M20 62 L80 62 L70 78 L30 78 Z' fill='%2300ffcc' stroke='%23ffffff' stroke-width='2'/%3E%3Cpath d='M50 20 L50 62 M50 24 L74 54 L50 54 Z' fill='%23ffcc00' stroke='%23ffffff' stroke-width='2'/%3E%3C/svg%3E">
+  
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; padding: 0; font-family: sans-serif; user-select: none; background: #020b14; color: #fff; overflow: hidden; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
+
+    /* Top Big Compass Dashboard */
+    .top-compass-panel {
+      background: #071628; border-bottom: 2px solid #ffcc00; padding: 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+    }
+    .compass-large-dial {
+      width: 85px; height: 85px; border-radius: 50%; border: 3px solid #ffcc00;
+      background: #000; position: relative; display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 0 10px rgba(0,255,204,0.5);
+    }
+    .c-label { position: absolute; font-size: 10px; font-weight: bold; color: #fff; }
+    .lbl-n { top: 3px; color: #ff0000; }
+    .lbl-s { bottom: 3px; }
+    .lbl-e { right: 5px; }
+    .lbl-w { left: 5px; }
+    
+    .compass-large-needle {
+      width: 6px; height: 60px; position: absolute; display: flex; flex-direction: column; align-items: center; transition: transform 0.1s linear;
+    }
+    .arrow-head { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 24px solid #00ffcc; }
+    .arrow-tail { width: 3px; height: 36px; background: #ffffff; }
+
+    .heading-info-box { text-align: left; flex: 1; margin-left: 15px; }
+    .heading-title { font-size: 11px; color: #ffcc00; font-weight: bold; letter-spacing: 1px; }
+    .heading-deg { font-size: 32px; font-weight: bold; color: #00ffcc; font-family: monospace; line-height: 1.1; }
+    .speed-sub { font-size: 12px; color: #ffffff; font-family: monospace; margin-top: 2px; }
+
+    .bt-connect-btn {
+      background: #1d3557; border: 2px solid #00ffcc; color: #fff; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px;
+    }
+
+    /* Full Screen Sonar Section */
+    .sonar-fullscreen-container {
+      flex: 1; background: #010810; position: relative; display: flex; flex-direction: column; border-bottom: 2px solid #00ffcc;
+    }
+    .sonar-hud-overlay {
+      position: absolute; top: 10px; left: 10px; background: rgba(5, 20, 34, 0.85); border: 1px solid #1a3a5a; padding: 8px 12px; border-radius: 8px; display: flex; gap: 15px; z-index: 10;
+    }
+    .sonar-hud-item div:first-child { font-size: 9px; color: #888; }
+    .sonar-hud-item div:last-child { font-size: 15px; font-weight: bold; color: #ffcc00; font-family: monospace; }
+    
+    #sonarCanvas { flex: 1; width: 100%; height: 100%; display: block; }
+
+    /* Bottom Action Bar */
+    .bottom-control-bar {
+      height: 60px; background: #071628; border-top: 1px solid #1a3a5a; display: flex; align-items: center; justify-content: space-around; padding: 6px;
+    }
+    .ctrl-btn {
+      flex: 1; margin: 0 4px; height: 42px; border: none; border-radius: 10px; color: white; font-weight: bold; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;
+    }
+    .btn-sonar-on { background: #0077b6; border: 1.5px solid #00ffcc; }
+    .btn-spot { background: #e63946; }
+    .btn-search { background: #2a9d8f; }
+    .btn-export { background: #1d3557; }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 20000; display: none; align-items: center; justify-content: center;
+    }
+    .modal-content {
+      background: #111; color: #fff; padding: 16px; border-radius: 12px; width: 90%; max-width: 320px; border: 1px solid #444;
+    }
+    .modal-title { font-size: 14px; font-weight: bold; color: #ffcc00; margin-bottom: 10px; text-align: center; }
+    .input-group { margin-bottom: 10px; }
+    .input-group label { font-size: 11px; color: #00ffcc; display: block; margin-bottom: 3px; }
+    .input-box { width: 100%; background: #000; color: #00ffcc; border: 1px solid #444; padding: 8px; border-radius: 6px; font-size: 14px; font-family: monospace; font-weight: bold; }
+    .modal-btn-row { display: flex; gap: 6px; margin-top: 10px; }
+    .modal-btn { flex: 1; padding: 8px; border: none; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 11px; }
+    .btn-save { background: #2a9d8f; color: #fff; }
+    .btn-cancel { background: #e63946; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Big Compass Panel -->
+  <div class="top-compass-panel">
+    <div style="display: flex; align-items: center;">
+      <div class="compass-large-dial" onclick="resetHeadingZero()">
+        <span class="c-label lbl-n">N</span>
+        <span class="c-label lbl-s">S</span>
+        <span class="c-label lbl-e">E</span>
+        <span class="c-label lbl-w">W</span>
+        <div class="compass-large-needle" id="bigNeedle">
+          <div class="arrow-head"></div>
+          <div class="arrow-tail"></div>
+        </div>
+      </div>
+      <div class="heading-info-box">
+        <div class="heading-title">🧭 HEADING / DIRECTION</div>
+        <div class="heading-deg" id="largeHeadingVal">0° N</div>
+        <div class="speed-sub" id="boatSpeedVal">வேகம்: 0.0 kts</div>
+      </div>
+    </div>
+    
+    <button class="bt-connect-btn" id="btSonarBtn" onclick="connectBluetoothSonar()">
+      📡 சோனார் இணை
+    </button>
+  </div>
+
+  <!-- Full Screen Sonar Section -->
+  <div class="sonar-fullscreen-container">
+    <div class="sonar-hud-overlay">
+      <div class="sonar-hud-item">
+        <div>ஆழம் (DEPTH)</div>
+        <div id="liveDepthVal">12.4 பாவம் (22.6 M)</div>
+      </div>
+      <div class="sonar-hud-item">
+        <div>தரை நிலை</div>
+        <div id="liveBottomVal" style="color: #00ffcc;">🪨 பாறை (Reef)</div>
+      </div>
+    </div>
+    <canvas id="sonarCanvas"></canvas>
+  </div>
+
+  <!-- Bottom Control Bar -->
+  <div class="bottom-control-bar">
+    <button class="ctrl-btn btn-spot" onclick="openSpotModal()">📍 பார் சேமி</button>
+    <button class="ctrl-btn btn-search" onclick="openCoordModal()">🔍 எண் தேடு</button>
+    <button class="ctrl-btn btn-sonar-on" onclick="toggleSonarScan()">⚡ ஸ்கேன்</button>
+    <button class="ctrl-btn btn-export" onclick="exportSavedData()">💾 எடு</button>
+  </div>
+
+  <!-- Spot Save Modal -->
+  <div class="modal-overlay" id="spotModal">
+    <div class="modal-content">
+      <div class="modal-title">📍 தற்போதைய பார் சேமிக்க</div>
+      <div class="input-group">
+        <label>பார் பெயர்:</label>
+        <input type="text" id="spotNameInput" class="input-box" placeholder="எ.கா. பாறை பார்">
+      </div>
+      <div class="input-group">
+        <label>ஜிபிஎஸ் ஒருங்கிணைப்பு (Coordinates):</label>
+        <div id="currentCoordDisplay" style="font-family:monospace; color:#00ffcc; font-size:12px; background:#000; padding:6px; border-radius:4px;">--</div>
+      </div>
+      <div class="modal-btn-row">
+        <button class="modal-btn btn-save" onclick="saveCurrentSpot()">💾 சேமி</button>
+        <button class="modal-btn btn-cancel" onclick="document.getElementById('spotModal').style.display='none'">ரத்து</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coord Search Modal -->
+  <div class="modal-overlay" id="coordModal">
+    <div class="modal-content">
+      <div class="modal-title">🔍 ஜிபிஎஸ் எண் தேடல்</div>
+      <div class="input-group">
+        <label>Latitude மினிட்:</label>
+        <input type="number" id="searchLatMin" class="input-box" placeholder="49.406" step="any">
+      </div>
+      <div class="input-group">
+        <label>Longitude மினிட்:</label>
+        <input type="number" id="searchLngMin" class="input-box" placeholder="8.972" step="any">
+      </div>
+      <div class="modal-btn-row">
+        <button class="modal-btn btn-save" onclick="executeCoordSearch()">🚀 தேடு & காட்டு</button>
+        <button class="modal-btn btn-cancel" onclick="document.getElementById('coordModal').style.display='none'">ரத்து</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentLat = 8.8238;
+    let currentLng = 78.1567;
+    let currentHeading = 0;
+    let isScanning = true;
+
+    function getHeadingDir(deg) {
+      const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+      return dirs[Math.round(deg / 45) % 8];
+    }
+
+    function resetHeadingZero() {
+      currentHeading = 0;
+      alert("🧭 காம்பஸ் திசை மீட்டமைக்கப்பட்டது!");
+    }
+
+    async function connectBluetoothSonar() {
+      try {
+        if (!navigator.bluetooth) { alert("உங்கள் பிரவுசரில் புளூடூத் ஆதரவு இல்லை!"); return; }
+        alert("📡 புளூடூத் சோனார் சாதனத்தைத் தேடுகிறது...");
+        const device = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: ['battery_service'] });
+        await device.gatt.connect();
+        document.getElementById('btSonarBtn').style.background = '#2a9d8f';
+        document.getElementById('bt-status-btn').style.background = '#00ffcc';
+        alert("✅ சோனார் வெற்றிகரமாக இணைக்கப்பட்டது: " + device.name);
+      } catch (err) { alert("⚠️ புளூடூத் இணைப்பு ரத்து செய்யப்பட்டது."); }
+    }
+
+    function toggleSonarScan() {
+      isScanning = !isScanning;
+      alert(isScanning ? "⚡ சோனார் ஸ்கேனிங் தொடங்கப்பட்டது!" : "⏸️ சோனார் ஸ்கேனிங் இடைநிறுத்தப்பட்டது.");
+    }
+
+    function formatCoord(val, isLat) {
+      const abs = Math.abs(val);
+      const deg = Math.floor(abs);
+      const min = ((abs - deg) * 60).toFixed(3);
+      const dir = isLat ? (val >= 0 ? "N" : "S") : (val >= 0 ? "E" : "W");
+      return `${deg}° ${min}' ${dir}`;
+    }
+
+    function openSpotModal() {
+      document.getElementById('currentCoordDisplay').innerText = `${formatCoord(currentLat, true)} | ${formatCoord(currentLng, false)}`;
+      document.getElementById('spotNameInput').value = "பார் " + new Date().toLocaleTimeString();
+      document.getElementById('spotModal').style.display = 'flex';
+    }
+
+    function saveCurrentSpot() {
+      let name = document.getElementById('spotNameInput').value.trim();
+      let saved = JSON.parse(localStorage.getItem('marineReefs') || '[]');
+      saved.push({ id: Date.now(), name: name, lat: currentLat, lng: currentLng, nautical_north: formatCoord(currentLat, true) });
+      localStorage.setItem('marineReefs', JSON.stringify(saved));
+      document.getElementById('spotModal').style.display = 'none';
+      alert("📍 " + name + " வெற்றிகரமாக சேமிக்கப்பட்டது!");
+    }
+
+    function openCoordModal() {
+      document.getElementById('coordModal').style.display = 'flex';
+    }
+
+    function executeCoordSearch() {
+      let mLat = parseFloat(document.getElementById('searchLatMin').value);
+      let mLng = parseFloat(document.getElementById('searchLngMin').value);
+      if(!isNaN(mLat) && !isNaN(mLng)) {
+        let targetLat = 8.0 + (mLat / 60.0);
+        let targetLng = 78.0 + (mLng / 60.0);
+        alert(`🎯 இலக்கு கண்டுபிடிக்கப்பட்டது!\nLat: ${formatCoord(targetLat, true)}\nLng: ${formatCoord(targetLng, false)}`);
+        document.getElementById('coordModal').style.display = 'none';
+      } else {
+        alert("சரியான எண்களை உள்ளிடவும்!");
+      }
+    }
+
+    function exportSavedData() {
+      const dataStr = localStorage.getItem('marineReefs') || '[]';
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([dataStr], { type: 'application/json' }));
+      a.download = `Odukan_GPS_Spots_${new Date().toLocaleDateString()}.json`;
+      a.click();
+    }
+
+    // Geolocation Live Watch
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(pos => {
+        currentLat = pos.coords.latitude;
+        currentLng = pos.coords.longitude;
+        let speed = pos.coords.speed ? (pos.coords.speed * 1.94384) : 0;
+        if (pos.coords.heading !== null && !isNaN(pos.coords.heading)) {
+          currentHeading = Math.round(pos.coords.heading);
+        }
+
+        document.getElementById('lat-coord').innerText = formatCoord(currentLat, true);
+        document.getElementById('lng-coord').innerText = formatCoord(currentLng, false);
+        document.getElementById('boatSpeedVal').innerText = `வேகம்: ${speed.toFixed(1)} kts`;
+        document.getElementById('largeHeadingVal').innerText = `${currentHeading}° ${getHeadingDir(currentHeading)}`;
+        
+        const needle = document.getElementById('bigNeedle');
+        if (needle) needle.style.transform = `rotate(${currentHeading}deg)`;
+      }, () => {}, { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 });
+    }
+
+    // Full Screen Sonar Canvas Animation
+    const canvas = document.getElementById('sonarCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let fishList = [
+      {x: 80, y: 50, s: 1.5, size: 16, color: '#ffcc00'},
+      {x: 220, y: 90, s: 1.0, size: 12, color: '#00ffcc'},
+      {x: 350, y: 60, s: 1.8, size: 18, color: '#ff5722'}
+    ];
+
+    function drawSonar() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      if (!isScanning) return;
+
+      // Bottom Seabed Curve (Reef / Sand)
+      ctx.beginPath();
+      ctx.fillStyle = '#03192f';
+      ctx.strokeStyle = '#00ffcc';
+      ctx.lineWidth = 3;
+      ctx.moveTo(0, canvas.height);
+      for(let x=0; x<=canvas.width; x+=3) {
+        ctx.lineTo(x, canvas.height - 40 + Math.sin((x + Date.now()/25)/50) * 12);
+      }
+      ctx.lineTo(canvas.width, canvas.height);
+      ctx.fill();
+      ctx.stroke();
+
+      // Swimming Fish animation
+      fishList.forEach(f => {
+        f.x -= f.s;
+        if (f.x < -40) f.x = canvas.width + 40;
+
+        ctx.fillStyle = f.color;
+        ctx.beginPath();
+        ctx.ellipse(f.x, f.y, f.size, f.size/2, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Fish tail
+        ctx.beginPath();
+        ctx.moveTo(f.x + f.size, f.y);
+        ctx.lineTo(f.x + f.size + 10, f.y - 8);
+        ctx.lineTo(f.x + f.size + 10, f.y + 8);
+        ctx.closePath();
+        ctx.fill();
+      });
+
+      requestAnimationFrame(drawSonar);
+    }
+    drawSonar();
+  </script>
+</body>
+</html>
