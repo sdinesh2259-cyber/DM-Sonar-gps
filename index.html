@@ -102,11 +102,11 @@
       height: 50px; background: #040d1a; border-top: 1px solid #1a3a5a; display: flex; align-items: center; justify-content: space-around; padding: 4px; z-index: 100;
     }
     .ctrl-btn {
-      flex: 1; margin: 0 2px; height: 38px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 10.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 3px;
+      flex: 1; margin: 0 2px; height: 38px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 3px;
     }
     .btn-spot { background: #e63946; }
-    .btn-list { background: #2a9d8f; }
-    .btn-sonar-on { background: #0077b6; border: 1px solid #00ffcc; }
+    .btn-file { background: #0077b6; border: 1px solid #00ffcc; }
+    .btn-sonar-on { background: #2a9d8f; }
     .btn-export { background: #1d3557; }
 
     /* Modals */
@@ -125,7 +125,6 @@
     .btn-save { background: #2a9d8f; color: #fff; }
     .btn-cancel { background: #e63946; color: #fff; }
 
-    /* Saved Spots List Item Style */
     .spot-item {
       background: #071628; border: 1px solid #1f3a60; padding: 8px 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
     }
@@ -192,9 +191,9 @@
   <!-- Bottom Control Bar -->
   <div class="bottom-control-bar">
     <button class="ctrl-btn btn-spot" onclick="openSpotModal()">📍 பார் சேமி</button>
-    <button class="ctrl-btn btn-list" onclick="openSpotsListModal()">📁 பட்டியல்</button>
+    <button class="ctrl-btn btn-file" onclick="openSpotsListModal()">📁 சோனார் ஃபைல்</button>
     <button class="ctrl-btn btn-sonar-on" onclick="toggleSonarScan()">⚡ ஸ்கேன்</button>
-    <button class="ctrl-btn btn-export" onclick="exportSavedData()">💾 எடு</button>
+    <button class="ctrl-btn btn-export" onclick="exportPhoneMemoryFile()">💾 டவுன்லோட்</button>
   </div>
 
   <!-- Spot Save Modal -->
@@ -210,7 +209,7 @@
         <div id="currentCoordDisplay" style="font-family:monospace; color:#00ffcc; font-size:12px; background:#000; padding:6px; border-radius:4px;">--</div>
       </div>
       <div class="modal-btn-row">
-        <button class="modal-btn btn-save" onclick="saveCurrentSpot()">💾 சேமி</button>
+        <button class="modal-btn btn-save" onclick="saveCurrentSpot()">💾 சேமி & ஃபைல் ஆக்கு</button>
         <button class="modal-btn btn-cancel" onclick="document.getElementById('spotModal').style.display='none'">ரத்து</button>
       </div>
     </div>
@@ -219,10 +218,12 @@
   <!-- Saved Spots List Modal -->
   <div class="modal-overlay" id="spotsListModal">
     <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-title">📁 சேமிக்கப்பட்ட பார்கள் பட்டியல்</div>
-      <div id="spotsContainer" style="max-height: 220px; overflow-y: auto; margin-bottom: 10px;">
+      <div class="modal-title">📂 சோனார் ஜிபிஎஸ் மெமரி ஃபைல்</div>
+      <div style="font-size: 11px; color: #00ffcc; margin-bottom: 8px; text-align: center;">போன் மெமரியில் பதிந்த பார்கள் பட்டியல்:</div>
+      <div id="spotsContainer" style="max-height: 200px; overflow-y: auto; margin-bottom: 10px;">
         <!-- Dynamic Items will load here -->
       </div>
+      <button class="modal-btn btn-save" onclick="exportPhoneMemoryFile()" style="width:100%; margin-bottom:6px;">📥 போன் மெமரிக்குள் ஃபைலாகப் பதி</button>
       <button class="modal-btn btn-cancel" onclick="document.getElementById('spotsListModal').style.display='none'" style="width:100%;">மூடு</button>
     </div>
   </div>
@@ -281,20 +282,24 @@
 
     function saveCurrentSpot() {
       let name = document.getElementById('spotNameInput').value.trim();
-      let saved = JSON.parse(localStorage.getItem('marineReefs') || '[]');
+      let saved = JSON.parse(localStorage.getItem('OdukanSonarGPS_Memory') || '[]');
       saved.push({ id: Date.now(), name: name, lat: currentLat, lng: currentLng, latStr: formatCoord(currentLat, true), lngStr: formatCoord(currentLng, false) });
-      localStorage.setItem('marineReefs', JSON.stringify(saved));
+      localStorage.setItem('OdukanSonarGPS_Memory', JSON.stringify(saved));
+      
+      // Automatically trigger phone memory download file
+      exportPhoneMemoryFileSilent(saved);
+
       document.getElementById('spotModal').style.display = 'none';
-      alert("📍 " + name + " வெற்றிகரமாக சேமிக்கப்பட்டது!");
+      alert("📍 " + name + " போன் மெமரி ஃபைலில் வெற்றிகரமாகப் பதிந்துவிட்டது!");
     }
 
     function openSpotsListModal() {
       const container = document.getElementById('spotsContainer');
       container.innerHTML = '';
-      let saved = JSON.parse(localStorage.getItem('marineReefs') || '[]');
+      let saved = JSON.parse(localStorage.getItem('OdukanSonarGPS_Memory') || '[]');
       
       if(saved.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:#888; font-size:12px; padding:20px;">சேமிக்கப்பட்ட பார்கள் எதுவும் இல்லை!</div>';
+        container.innerHTML = '<div style="text-align:center; color:#888; font-size:12px; padding:20px;">மெமரி ஃபைலில் பார்கள் எதுவும் இல்லை!</div>';
       } else {
         saved.forEach(item => {
           const div = document.createElement('div');
@@ -313,17 +318,27 @@
     }
 
     function deleteSpot(id) {
-      let saved = JSON.parse(localStorage.getItem('marineReefs') || '[]');
+      let saved = JSON.parse(localStorage.getItem('OdukanSonarGPS_Memory') || '[]');
       saved = saved.filter(item => item.id !== id);
-      localStorage.setItem('marineReefs', JSON.stringify(saved));
-      openSpotsListModal(); // Refresh list
+      localStorage.setItem('OdukanSonarGPS_Memory', JSON.stringify(saved));
+      openSpotsListModal();
     }
 
-    function exportSavedData() {
-      const dataStr = localStorage.getItem('marineReefs') || '[]';
+    function exportPhoneMemoryFile() {
+      const dataStr = localStorage.getItem('OdukanSonarGPS_Memory') || '[]';
+      const blob = new Blob([dataStr], { type: 'application/json' });
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([dataStr], { type: 'application/json' }));
-      a.download = `Odukan_Spots_${new Date().toLocaleDateString()}.json`;
+      a.href = URL.createObjectURL(blob);
+      a.download = `Odukan_Sonar_GPS_Memory_${new Date().toLocaleDateString().replace(/\//g, '-')}.json`;
+      a.click();
+      alert("📥 போன் டவுன்லோட்ஸ் (Downloads) ஃபோல்டருக்குள் ஃபைல் சேமிக்கப்பட்டுவிட்டது!");
+    }
+
+    function exportPhoneMemoryFileSilent(savedData) {
+      const blob = new Blob([JSON.stringify(savedData)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `Odukan_Sonar_GPS_Memory.json`;
       a.click();
     }
 
@@ -379,6 +394,7 @@
       ctx.stroke();
 
       // Fish
+      fileListMock = [];
       fishList.forEach(f => {
         f.x -= f.s;
         if (f.x < -40) f.x = canvas.width + 40;
